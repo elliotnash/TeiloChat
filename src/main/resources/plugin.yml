@@ -1,0 +1,14 @@
+name: TeiloChat
+version: ${project.version}
+main: org.elliotnash.teilochat.TeiloChat
+api-version: 1.16
+authors: [Elliot Nash]
+description: Chat customization plugin for spigot
+website: elliotnash.org
+commands:
+  teilochat:
+    aliases: tc
+permissions:
+  teilochat.other:
+    description: lets a player set someone elses name / message prefix
+    default: op
