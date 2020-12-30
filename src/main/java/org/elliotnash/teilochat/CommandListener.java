@@ -135,6 +135,8 @@ public class CommandListener implements CommandExecutor, TabCompleter {
 
             for (OfflinePlayer player : Bukkit.getOfflinePlayers()){
                 String playerName = player.getName();
+                if (playerName.equals(((Player) sender).getName()))
+                    continue;
                 if (name.toLowerCase().contains(playerName.toLowerCase()))
                     return 4;
             }
@@ -151,6 +153,8 @@ public class CommandListener implements CommandExecutor, TabCompleter {
 
             for (OfflinePlayer playerloop : Bukkit.getOfflinePlayers()){
                 String playerName = playerloop.getName();
+                if (playerName.equals(((Player) sender).getName()))
+                    continue;
                 if (name.toLowerCase().contains(playerName.toLowerCase()))
                     return 4;
             }
