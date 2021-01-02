@@ -6,7 +6,7 @@
 
     <groupId>TeiloChat</groupId>
     <artifactId>teilochat</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Teilochat</name>
