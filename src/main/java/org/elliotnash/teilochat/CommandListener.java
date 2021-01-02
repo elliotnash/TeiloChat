@@ -1,5 +1,9 @@
 package org.elliotnash.teilochat;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -16,6 +20,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommandListener implements CommandExecutor, TabCompleter {
+
+    ChatFormatter formatter = new ChatFormatter();
+    BukkitAudiences bukkitAudiences = BukkitAudiences.create(TeiloChat.plugin);
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -123,44 +130,64 @@ public class CommandListener implements CommandExecutor, TabCompleter {
                     sender.sendMessage("You don't have a custom name set");
                 else {
                     name = playerMap.get("name");
+                    TextComponent nameComponent = formatter.format(name);
                     sender.sendMessage("Your name is set to: "+name);
-                    sender.sendMessage("With formatting: "+ ChatColor.translateAlternateColorCodes('&', name));
+                    sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(nameComponent));
+                    bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
                 }
             }
             return 0;
         } else if (args.size()==2){
             if (!(sender instanceof Player)) return 3;
-            targetUUID = ((Player) sender).getUniqueId();
+            Player player = ((Player) sender);
+            targetUUID = player.getUniqueId();
             name = args.get(1);
 
-            for (OfflinePlayer player : Bukkit.getOfflinePlayers()){
-                String playerName = player.getName();
+            for (OfflinePlayer playerLoop : Bukkit.getOfflinePlayers()){
+                String playerName = playerLoop.getName();
                 if (playerName.equals(((Player) sender).getName()))
                     continue;
                 if (name.toLowerCase().contains(playerName.toLowerCase()))
                     return 4;
             }
 
+            String colourName = LegacyComponentSerializer.legacySection().serialize(formatter.format(name));
+
+            player.setDisplayName(colourName);
+            player.setPlayerListName(colourName);
+
+            TextComponent nameComponent = formatter.format(name);
             sender.sendMessage("Your name has been changed to: "+name);
-            sender.sendMessage("With formatting: "+ ChatColor.translateAlternateColorCodes('&', name));
+            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(nameComponent));
+            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer player = getOfflinePlayer(args.get(1));
-            if (player==null) return 1;
-            targetUUID = player.getUniqueId();
+            OfflinePlayer offlinePlayer = getOfflinePlayer(args.get(1));
+            if (offlinePlayer==null) return 1;
+            targetUUID = offlinePlayer.getUniqueId();
             name = args.get(2);
 
-            for (OfflinePlayer playerloop : Bukkit.getOfflinePlayers()){
-                String playerName = playerloop.getName();
+            for (OfflinePlayer playerLoop : Bukkit.getOfflinePlayers()){
+                String playerName = playerLoop.getName();
                 if (playerName.equals(((Player) sender).getName()))
                     continue;
                 if (name.toLowerCase().contains(playerName.toLowerCase()))
                     return 4;
             }
 
+            String colourName = ChatColor.translateAlternateColorCodes('&', name);
+
+            if (offlinePlayer.isOnline()){
+                Player player = offlinePlayer.getPlayer();
+                player.setDisplayName(colourName);
+                player.setPlayerListName(colourName);
+            }
+
+            TextComponent nameComponent = formatter.format(name);
             sender.sendMessage(args.get(1)+"'s name has been changed to: "+name);
-            sender.sendMessage("With formatting: "+ ChatColor.translateAlternateColorCodes('&', name));
+            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(nameComponent));
+            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else {
             return 1;
@@ -201,8 +228,11 @@ public class CommandListener implements CommandExecutor, TabCompleter {
                     sender.sendMessage("You don't have a custom message prefix set");
                 else {
                     prefix = playerMap.get("msgprefix");
+
+                    TextComponent prefixComponent = formatter.format(prefix);
                     sender.sendMessage("Your message prefix is set to: "+prefix);
-                    sender.sendMessage("With formatting: "+ ChatColor.translateAlternateColorCodes('&', prefix));
+                    sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(prefixComponent));
+                    bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
                 }
             }
             return 0;
@@ -211,8 +241,10 @@ public class CommandListener implements CommandExecutor, TabCompleter {
             targetUUID = ((Player) sender).getUniqueId();
             prefix = args.get(1);
 
+            TextComponent prefixComponent = formatter.format(prefix);
             sender.sendMessage("Your message prefix has been changed to: "+prefix);
-            sender.sendMessage("With formatting: "+ ChatColor.translateAlternateColorCodes('&', prefix));
+            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(prefixComponent));
+            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;
@@ -221,8 +253,10 @@ public class CommandListener implements CommandExecutor, TabCompleter {
             targetUUID = player.getUniqueId();
             prefix = args.get(2);
 
+            TextComponent prefixComponent = formatter.format(prefix);
             sender.sendMessage(args.get(1)+"'s message prefix has been changed to: "+prefix);
-            sender.sendMessage("With formatting: "+ ChatColor.translateAlternateColorCodes('&', prefix));
+            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(prefixComponent));
+            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else {
             return 1;
