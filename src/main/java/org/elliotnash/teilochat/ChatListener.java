@@ -71,7 +71,7 @@ public class ChatListener implements Listener{
             if (playerMap.containsKey("name")) name = playerMap.get("name");
         }
 
-        bukkitAudiences.player(event.getPlayer()).sendMessage(Component.text()
+        bukkitAudiences.players().sendMessage(Component.text()
                 .append(formatter.format(name))
                 .append(Component.text().color(NamedTextColor.YELLOW).content(" joined the game"))
         );
@@ -86,7 +86,7 @@ public class ChatListener implements Listener{
             if (playerMap.containsKey("name")) name = playerMap.get("name");
         }
 
-        bukkitAudiences.player(event.getPlayer()).sendMessage(Component.text()
+        bukkitAudiences.players().sendMessage(Component.text()
                 .append(formatter.format(name))
                 .append(Component.text().color(NamedTextColor.YELLOW).content(" joined the game"))
         );
