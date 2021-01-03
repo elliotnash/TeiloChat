@@ -12,15 +12,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatFormatter {
-//    public static void main(String[] args) {
-//        ChatFormatter chatFormatter = new ChatFormatter();
-//        System.out.println(chatFormatter.format("&%n&#55782a&#40af2b%hello this is a test"));
-//    }
 
     Pattern colorPattern = Pattern.compile("(&[0-9a-fA-FrR]|&#[0-9a-fA-F]{6}|&%.+%)");
 
     public TextComponent format(String string){
-        System.out.println(string.replaceAll("(?<=&)#(?![0-9a-fA-F])", ""));
         StringBuilder sb = new StringBuilder(string);
         sb.append("&r");
         for (int i = 0; i < sb.length(); i++){
@@ -46,16 +41,11 @@ public class ChatFormatter {
                             if (sb.charAt(resetIndex)!=' ')
                                 sb.insert(resetIndex, colorList.next());
                         }
-                        System.out.println(sb.toString());
                         sb.delete(firstpc-1, lastpc+1);
-                        System.out.println(sb.toString());
-                        System.out.println(colorList);
-                        System.out.println("First: "+firstpc+" Last: "+lastpc);
                     }
                 }
             }
         }
-        System.out.println(sb.toString());
         string = sb.toString();
 
         //remove all # if malformed, lazy fix

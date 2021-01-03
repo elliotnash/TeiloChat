@@ -88,7 +88,7 @@ public class ChatListener implements Listener{
 
         bukkitAudiences.players().sendMessage(Component.text()
                 .append(formatter.format(name))
-                .append(Component.text().color(NamedTextColor.YELLOW).content(" joined the game"))
+                .append(Component.text().color(NamedTextColor.YELLOW).content(" left the game"))
         );
     }
 
