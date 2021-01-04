@@ -71,10 +71,12 @@ public class ChatListener implements Listener{
             if (playerMap.containsKey("name")) name = playerMap.get("name");
         }
 
-        bukkitAudiences.players().sendMessage(Component.text()
+        TextComponent message = Component.text()
                 .append(formatter.format(name))
-                .append(Component.text().color(NamedTextColor.YELLOW).content(" joined the game"))
-        );
+                .append(Component.text().color(NamedTextColor.YELLOW).content(" joined the game")).build();
+
+        bukkitAudiences.players().sendMessage(message);
+        bukkitAudiences.console().sendMessage(message);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -86,10 +88,12 @@ public class ChatListener implements Listener{
             if (playerMap.containsKey("name")) name = playerMap.get("name");
         }
 
-        bukkitAudiences.players().sendMessage(Component.text()
+        TextComponent message = Component.text()
                 .append(formatter.format(name))
-                .append(Component.text().color(NamedTextColor.YELLOW).content(" left the game"))
-        );
+                .append(Component.text().color(NamedTextColor.YELLOW).content(" left the game")).build();
+
+        bukkitAudiences.players().sendMessage(message);
+        bukkitAudiences.console().sendMessage(message);
     }
 
 }
