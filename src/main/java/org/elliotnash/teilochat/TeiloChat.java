@@ -53,8 +53,6 @@ public final class TeiloChat extends JavaPlugin {
             this.getConfig().createSection("playerFormats", formatMap);
         }
 
-        logger.info(formatMap.toString());
-
         getServer().getPluginManager().registerEvents(new ChatListener(), this);
 
         getCommand("teilochat").setExecutor(new CommandListener());
