@@ -1,5 +1,6 @@
 package org.elliotnash.teilochat;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -44,7 +45,14 @@ public class ChatListener implements Listener{
 
         event.setMessage(LegacyComponentSerializer.legacySection().serialize(messageComponent));
         event.setFormat("%1$s%2$s");
-        bukkitAudiences.players().sendMessage(nameComponent.append(messageComponent));
+
+        TextComponent finalComponent = nameComponent.append(messageComponent);
+
+        for (Player player : event.getRecipients()){
+            Audience audience = bukkitAudiences.player(player);
+            audience.sendMessage(finalComponent);
+        }
+
     }
 
     @EventHandler
