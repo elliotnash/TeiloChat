@@ -1,5 +1,5 @@
 name: TeiloChat
-version: ${project.version}
+version: ${jenkins.buildNumber}
 main: org.elliotnash.teilochat.TeiloChat
 api-version: 1.16
 authors: [Elliot Nash]

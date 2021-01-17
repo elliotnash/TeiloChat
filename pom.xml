@@ -13,7 +13,9 @@
 
     <description>Chat customization plugin for spigot</description>
     <properties>
-        <java.version>1.8</java.version>
+        <!--suppress UnresolvedMavenProperty -->
+        <jenkins.buildNumber>${env.BUILD_NUMBER}</jenkins.buildNumber>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <url>elliotnash.org</url>
