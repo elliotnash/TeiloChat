@@ -51,8 +51,6 @@ public class ChatListener implements Listener{
 
         TextComponent finalComponent = nameComponent.append(messageComponent);
 
-        System.out.println(recipients);
-
         for (Player player : recipients){
             Audience audience = bukkitAudiences.player(player);
             audience.sendMessage(finalComponent);
