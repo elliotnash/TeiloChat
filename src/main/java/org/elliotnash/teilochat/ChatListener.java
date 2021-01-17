@@ -19,6 +19,7 @@ import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ChatListener implements Listener{
 
@@ -37,6 +38,8 @@ public class ChatListener implements Listener{
         }
 
         //clear message recipients so it only goes to console
+        //but save first to use later
+        Set<Player> recipients = new HashSet<Player>(event.getRecipients());
         event.getRecipients().clear();
 
         //get text components
@@ -48,7 +51,9 @@ public class ChatListener implements Listener{
 
         TextComponent finalComponent = nameComponent.append(messageComponent);
 
-        for (Player player : event.getRecipients()){
+        System.out.println(recipients);
+
+        for (Player player : recipients){
             Audience audience = bukkitAudiences.player(player);
             audience.sendMessage(finalComponent);
         }
