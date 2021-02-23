@@ -66,22 +66,23 @@ public class CommandListener implements CommandExecutor, TabCompleter {
         //status codes: 0 = success, 1 = improper syntax, 2 = missing permission, 3 = run from console, 4 = invalid name
         int returnCode = 0;
 
-        LinkedList<String> argList = parser(args);
+        if (args.length == 0) returnCode = 1;
+        else {
+            LinkedList<String> argList = parser(args);
 
-        if (argList.size() == 0) returnCode = 1;
-
-        if (argList.size() >= 1 && argList.size() <= 3){
-            switch (argList.get(0)){
-                case "name":
-                    returnCode = setName(sender, argList);
-                    break;
-                case "msgprefix":
-                    returnCode = setMsgPrefix(sender, argList);
-                    break;
-                case "reset":
-                    returnCode = reset(sender, argList);
-                    break;
-                default: returnCode=1; break;
+            if (argList.size() >= 1 && argList.size() <= 3){
+                switch (argList.get(0)){
+                    case "name":
+                        returnCode = setName(sender, argList);
+                        break;
+                    case "msgprefix":
+                        returnCode = setMsgPrefix(sender, argList);
+                        break;
+                    case "reset":
+                        returnCode = reset(sender, argList);
+                        break;
+                    default: returnCode=1; break;
+                }
             }
         }
 
