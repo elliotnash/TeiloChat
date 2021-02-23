@@ -4,10 +4,8 @@ package org.elliotnash.teilochat;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.LinkedList;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

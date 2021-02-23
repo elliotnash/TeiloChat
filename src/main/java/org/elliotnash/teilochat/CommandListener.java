@@ -1,9 +1,7 @@
 package org.elliotnash.teilochat;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -11,7 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
@@ -22,7 +19,6 @@ import java.util.regex.Pattern;
 public class CommandListener implements CommandExecutor, TabCompleter {
 
     ChatFormatter formatter = new ChatFormatter();
-    BukkitAudiences bukkitAudiences = BukkitAudiences.create(TeiloChat.plugin);
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -132,8 +128,7 @@ public class CommandListener implements CommandExecutor, TabCompleter {
                     name = playerMap.get("name");
                     TextComponent nameComponent = formatter.format(name);
                     sender.sendMessage("Your name is set to: "+name);
-                    sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(nameComponent));
-                    bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
+                    sender.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
                 }
             }
             return 0;
@@ -151,15 +146,13 @@ public class CommandListener implements CommandExecutor, TabCompleter {
                     return 4;
             }
 
-            String colourName = LegacyComponentSerializer.legacySection().serialize(formatter.format(name));
-
-            player.setDisplayName(colourName);
-            player.setPlayerListName(colourName);
-
             TextComponent nameComponent = formatter.format(name);
+
+            player.displayName(nameComponent);
+            player.playerListName(nameComponent);
+            
             sender.sendMessage("Your name has been changed to: "+name);
-            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(nameComponent));
-            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
+            player.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;
@@ -176,18 +169,17 @@ public class CommandListener implements CommandExecutor, TabCompleter {
                     return 4;
             }
 
-            String colourName = ChatColor.translateAlternateColorCodes('&', name);
+            TextComponent nameComponent = formatter.format(name);
+
 
             if (offlinePlayer.isOnline()){
                 Player player = offlinePlayer.getPlayer();
-                player.setDisplayName(colourName);
-                player.setPlayerListName(colourName);
+                player.displayName(nameComponent);
+                player.playerListName(nameComponent);
             }
 
-            TextComponent nameComponent = formatter.format(name);
             sender.sendMessage(args.get(1)+"'s name has been changed to: "+name);
-            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(nameComponent));
-            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
+            sender.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else {
             return 1;
@@ -231,8 +223,7 @@ public class CommandListener implements CommandExecutor, TabCompleter {
 
                     TextComponent prefixComponent = formatter.format(prefix);
                     sender.sendMessage("Your message prefix is set to: "+prefix);
-                    sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(prefixComponent));
-                    bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
+                    sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
                 }
             }
             return 0;
@@ -243,8 +234,7 @@ public class CommandListener implements CommandExecutor, TabCompleter {
 
             TextComponent prefixComponent = formatter.format(prefix);
             sender.sendMessage("Your message prefix has been changed to: "+prefix);
-            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(prefixComponent));
-            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
+            sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;
@@ -255,8 +245,7 @@ public class CommandListener implements CommandExecutor, TabCompleter {
 
             TextComponent prefixComponent = formatter.format(prefix);
             sender.sendMessage(args.get(1)+"'s message prefix has been changed to: "+prefix);
-            sender.sendMessage("With legacy formatting: "+ LegacyComponentSerializer.legacySection().serialize(prefixComponent));
-            bukkitAudiences.player(targetUUID).sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
+            sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else {
             return 1;

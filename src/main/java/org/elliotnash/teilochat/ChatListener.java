@@ -1,21 +1,15 @@
 package org.elliotnash.teilochat;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +18,6 @@ import java.util.Set;
 public class ChatListener implements Listener{
 
     ChatFormatter formatter = new ChatFormatter();
-    BukkitAudiences bukkitAudiences = BukkitAudiences.create(TeiloChat.plugin);
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void OnMessage(AsyncPlayerChatEvent event) {
@@ -52,8 +45,7 @@ public class ChatListener implements Listener{
         TextComponent finalComponent = nameComponent.append(messageComponent);
 
         for (Player player : recipients){
-            Audience audience = bukkitAudiences.player(player);
-            audience.sendMessage(finalComponent);
+            player.sendMessage(finalComponent);
         }
 
     }
@@ -65,17 +57,16 @@ public class ChatListener implements Listener{
             HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
             if (playerMap.containsKey("name")) name = playerMap.get("name");
         }
-        name = LegacyComponentSerializer.legacySection().serialize(formatter.format(name));
+        TextComponent nameComponent = formatter.format(name);
 
-        event.getPlayer().setDisplayName(name);
-        event.getPlayer().setPlayerListName(name);
+        event.getPlayer().displayName(nameComponent);
+        event.getPlayer().playerListName(nameComponent);
 
     }
 
     //events to handle colourizing join+quit messages
     @EventHandler(priority = EventPriority.LOWEST)
     public void OnPlayerJoin(PlayerJoinEvent event){
-        event.setJoinMessage(null);
         String name = ChatColor.YELLOW+event.getPlayer().getName();
         if (TeiloChat.formatMap.containsKey(event.getPlayer().getUniqueId())) {
             HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
@@ -86,13 +77,11 @@ public class ChatListener implements Listener{
                 .append(formatter.format(name))
                 .append(Component.text().color(NamedTextColor.YELLOW).content(" joined the game")).build();
 
-        bukkitAudiences.players().sendMessage(message);
-        bukkitAudiences.console().sendMessage(message);
+        event.joinMessage(message);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void OnPlayerQuit(PlayerQuitEvent event){
-        event.setQuitMessage(null);
         String name = ChatColor.YELLOW+event.getPlayer().getName();
         if (TeiloChat.formatMap.containsKey(event.getPlayer().getUniqueId())) {
             HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
@@ -103,8 +92,8 @@ public class ChatListener implements Listener{
                 .append(formatter.format(name))
                 .append(Component.text().color(NamedTextColor.YELLOW).content(" left the game")).build();
 
-        bukkitAudiences.players().sendMessage(message);
-        bukkitAudiences.console().sendMessage(message);
+        event.quitMessage(message);
+
     }
 
 }
