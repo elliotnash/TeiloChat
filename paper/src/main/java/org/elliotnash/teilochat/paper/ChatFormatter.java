@@ -1,4 +1,4 @@
-package org.elliotnash.teilochat;
+package org.elliotnash.teilochat.paper;
 
 
 import net.kyori.adventure.text.TextComponent;

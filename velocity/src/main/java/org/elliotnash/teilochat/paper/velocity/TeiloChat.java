@@ -1,7 +1,6 @@
-package org.elliotnash.recoil.velocity;
+package org.elliotnash.teilochat.paper.velocity;
 
 import com.google.inject.Inject;
-import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;

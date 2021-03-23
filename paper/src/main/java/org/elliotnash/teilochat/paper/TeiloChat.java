@@ -1,14 +1,11 @@
-package org.elliotnash.teilochat;
+package org.elliotnash.teilochat.paper;
 
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
