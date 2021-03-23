@@ -12,6 +12,7 @@
         <module>bundle</module>
         <module>core</module>
         <module>spigot</module>
+        <module>velocity</module>
     </modules>
 
     <properties>
