@@ -16,6 +16,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.elliotnash.teilochat.core.ChatFormatter;
+
 public class CommandListener implements CommandExecutor, TabCompleter {
 
     ChatFormatter formatter = new ChatFormatter();
