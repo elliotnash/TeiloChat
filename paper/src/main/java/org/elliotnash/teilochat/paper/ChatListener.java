@@ -16,20 +16,27 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.elliotnash.teilochat.core.ChatFormatter;
+import org.elliotnash.teilochat.core.config.ConfigManager;
+import org.elliotnash.teilochat.core.config.PlayerFormat;
 
 public class ChatListener implements Listener{
 
     ChatFormatter formatter = new ChatFormatter();
+    ConfigManager config;
+
+    public ChatListener(ConfigManager config){
+        this.config = config;
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void OnMessage(AsyncPlayerChatEvent event) {
         String name = event.getPlayer().getName();
         String msgPrefix = "&r: ";
         String message = event.getMessage();
-        if (TeiloChat.formatMap.containsKey(event.getPlayer().getUniqueId())){
-            HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
-            if (playerMap.containsKey("name")) name = playerMap.get("name");
-            if (playerMap.containsKey("msgprefix")) msgPrefix = playerMap.get("msgprefix");
+        if (config.contains(event.getPlayer().getUniqueId())){
+            PlayerFormat format = config.get(event.getPlayer().getUniqueId());
+            if (format.name != null) name = format.name;
+            if (format.msgprefix != null) msgPrefix = format.msgprefix;
         }
 
         //clear message recipients so it only goes to console
@@ -55,9 +62,9 @@ public class ChatListener implements Listener{
     @EventHandler
     public void OnPlayerLogin(PlayerLoginEvent event){
         String name = event.getPlayer().getName();
-        if (TeiloChat.formatMap.containsKey(event.getPlayer().getUniqueId())){
-            HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
-            if (playerMap.containsKey("name")) name = playerMap.get("name");
+        if (config.contains(event.getPlayer().getUniqueId())){
+            PlayerFormat format = config.get(event.getPlayer().getUniqueId());
+            if (format.name != null) name = format.name;
         }
         TextComponent nameComponent = formatter.format(name);
 
@@ -70,9 +77,9 @@ public class ChatListener implements Listener{
     @EventHandler(priority = EventPriority.LOWEST)
     public void OnPlayerJoin(PlayerJoinEvent event){
         String name = ChatColor.YELLOW+event.getPlayer().getName();
-        if (TeiloChat.formatMap.containsKey(event.getPlayer().getUniqueId())) {
-            HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
-            if (playerMap.containsKey("name")) name = playerMap.get("name");
+        if (config.contains(event.getPlayer().getUniqueId())) {
+            PlayerFormat format = config.get(event.getPlayer().getUniqueId());
+            if (format.name != null) name = format.name;
         }
 
         TextComponent message = Component.text()
@@ -85,9 +92,9 @@ public class ChatListener implements Listener{
     @EventHandler(priority = EventPriority.LOWEST)
     public void OnPlayerQuit(PlayerQuitEvent event){
         String name = ChatColor.YELLOW+event.getPlayer().getName();
-        if (TeiloChat.formatMap.containsKey(event.getPlayer().getUniqueId())) {
-            HashMap<String, String> playerMap = TeiloChat.formatMap.get(event.getPlayer().getUniqueId());
-            if (playerMap.containsKey("name")) name = playerMap.get("name");
+        if (config.contains(event.getPlayer().getUniqueId())) {
+            PlayerFormat format = config.get(event.getPlayer().getUniqueId());
+            if (format.name != null) name = format.name;
         }
 
         TextComponent message = Component.text()

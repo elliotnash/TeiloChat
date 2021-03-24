@@ -1,26 +1,24 @@
 package org.elliotnash.teilochat.paper;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.elliotnash.teilochat.core.ChatFormatter;
+import org.elliotnash.teilochat.core.commands.CommandHandler;
+import org.elliotnash.teilochat.core.config.ConfigManager;
 
-public class CommandListener implements CommandExecutor, TabCompleter {
+public class CommandListener implements org.bukkit.command.CommandExecutor, TabCompleter {
 
-    ChatFormatter formatter = new ChatFormatter();
+    private final CommandHandler handler;
+
+    public CommandListener(ConfigManager config){
+        handler = new CommandHandler(config, new PaperUtils());
+    }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -46,244 +44,20 @@ public class CommandListener implements CommandExecutor, TabCompleter {
         return completions;
     }
 
-    public LinkedList<String> parser(String[] args){
-        //convert arg array to String
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
         StringBuilder argStringBuilder = new StringBuilder();
         for (String str : args){
             argStringBuilder.append(str).append(" ");
         }
-        argStringBuilder.setLength(argStringBuilder.length()-1);
+        if (args.length != 0)
+            argStringBuilder.setLength(argStringBuilder.length()-1);
         String argString = argStringBuilder.toString();
 
-        //parse by spaces, but also also keep quotations
-        LinkedList<String> argList = new LinkedList<>();
-        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(argString);
-        while (m.find())
-            argList.add(m.group(1).replace("\"", ""));
-        return argList;
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        //status codes: 0 = success, 1 = improper syntax, 2 = missing permission, 3 = run from console, 4 = invalid name
-        int returnCode = 0;
-
-        if (args.length == 0) returnCode = 1;
-        else {
-            LinkedList<String> argList = parser(args);
-
-            if (argList.size() >= 1 && argList.size() <= 3){
-                switch (argList.get(0)){
-                    case "name":
-                        returnCode = setName(sender, argList);
-                        break;
-                    case "msgprefix":
-                        returnCode = setMsgPrefix(sender, argList);
-                        break;
-                    case "reset":
-                        returnCode = reset(sender, argList);
-                        break;
-                    default: returnCode=1; break;
-                }
-            }
-        }
-
-        switch (returnCode){
-            case 1:
-                sender.sendMessage(ChatColor.RED+"Invalid command!");
-                sender.sendMessage("/tc name <name> sets your name");
-                sender.sendMessage("/tc msgprefix <prefix> sets the prefix before your message");
-                sender.sendMessage("/tc reset resets your chat customization");
-                sender.sendMessage("If you need to include spaces in your name or prefix, please surround it with quotes");
-                sender.sendMessage("ie. /tc name \"Elliot Nash\" would set my name to Elliot Nash");
-                break;
-            case 2:
-                sender.sendMessage(ChatColor.RED+"You are missing permission to set other people's names");
-                break;
-            case 3:
-                sender.sendMessage(ChatColor.RED+"You can't run this message from console");
-                break;
-            case 4:
-                sender.sendMessage(ChatColor.RED+"You can't set your name to another users' name");
-                break;
-            case 5:
-                sender.sendMessage(ChatColor.RED+"Invalid user");
-        }
+        handler.command(new PaperSender(sender), argString);
 
         return true;
-    }
-
-    public void saveConfig(){
-        TeiloChat.getMain().getConfig().createSection("playerFormats", TeiloChat.formatMap);
-        TeiloChat.getMain().saveConfig();
-    }
-
-    public int setName(CommandSender sender, List<String> args){
-        UUID targetUUID;
-        String name;
-        if (args.size()==1){
-            if (!(sender instanceof Player)) return 3;
-            targetUUID = ((Player) sender).getUniqueId();
-            if (!TeiloChat.formatMap.containsKey(targetUUID))
-                sender.sendMessage("You don't have a custom name set.");
-            else{
-                HashMap<String, String> playerMap = TeiloChat.formatMap.get(targetUUID);
-                if (!playerMap.containsKey("name"))
-                    sender.sendMessage("You don't have a custom name set");
-                else {
-                    name = playerMap.get("name");
-                    TextComponent nameComponent = formatter.format(name);
-                    sender.sendMessage("Your name is set to: "+name);
-                    sender.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
-                }
-            }
-            return 0;
-        } else if (args.size()==2){
-            if (!(sender instanceof Player)) return 3;
-            Player player = ((Player) sender);
-            targetUUID = player.getUniqueId();
-            name = args.get(1);
-
-            for (OfflinePlayer playerLoop : Bukkit.getOfflinePlayers()){
-                String playerName = playerLoop.getName();
-                if (playerName.equals(((Player) sender).getName()))
-                    continue;
-                if (name.toLowerCase().contains(playerName.toLowerCase()))
-                    return 4;
-            }
-
-            TextComponent nameComponent = formatter.format(name);
-
-            player.displayName(nameComponent);
-            player.playerListName(nameComponent);
-            
-            sender.sendMessage("Your name has been changed to: "+name);
-            player.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
-
-        } else if (args.size()==3){
-            if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer offlinePlayer = getOfflinePlayer(args.get(1));
-            if (offlinePlayer==null) return 1;
-            targetUUID = offlinePlayer.getUniqueId();
-            name = args.get(2);
-
-            for (OfflinePlayer playerLoop : Bukkit.getOfflinePlayers()){
-                String playerName = playerLoop.getName();
-                if (playerName.equals(((Player) sender).getName()))
-                    continue;
-                if (name.toLowerCase().contains(playerName.toLowerCase()))
-                    return 4;
-            }
-
-            TextComponent nameComponent = formatter.format(name);
-
-
-            if (offlinePlayer.isOnline()){
-                Player player = offlinePlayer.getPlayer();
-                player.displayName(nameComponent);
-                player.playerListName(nameComponent);
-            }
-
-            sender.sendMessage(args.get(1)+"'s name has been changed to: "+name);
-            sender.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
-
-        } else {
-            return 1;
-        }
-
-        HashMap<String, String> playerMap = new HashMap<>();
-        if (TeiloChat.formatMap.containsKey(targetUUID))
-            playerMap = TeiloChat.formatMap.get(targetUUID);
-        playerMap.put("name", name);
-        TeiloChat.formatMap.put(targetUUID, playerMap);
-
-        saveConfig();
-
-        return 0;
-    }
-
-    public OfflinePlayer getOfflinePlayer(String name){
-        OfflinePlayer player = null;
-        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()){
-            if (offlinePlayer.getName()!=null && offlinePlayer.getName().equals(name)){
-                player = offlinePlayer;
-            }
-        }
-        return player;
-    }
-
-    public int setMsgPrefix(CommandSender sender, List<String> args){
-        UUID targetUUID;
-        String prefix;
-        if (args.size()==1){
-            if (!(sender instanceof Player)) return 3;
-            targetUUID = ((Player) sender).getUniqueId();
-            if (!TeiloChat.formatMap.containsKey(targetUUID))
-                sender.sendMessage("You don't have a custom message prefix set.");
-            else{
-                HashMap<String, String> playerMap = TeiloChat.formatMap.get(targetUUID);
-                if (!playerMap.containsKey("msgprefix"))
-                    sender.sendMessage("You don't have a custom message prefix set");
-                else {
-                    prefix = playerMap.get("msgprefix");
-
-                    TextComponent prefixComponent = formatter.format(prefix);
-                    sender.sendMessage("Your message prefix is set to: "+prefix);
-                    sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
-                }
-            }
-            return 0;
-        } else if (args.size()==2){
-            if (!(sender instanceof Player)) return 3;
-            targetUUID = ((Player) sender).getUniqueId();
-            prefix = args.get(1);
-
-            TextComponent prefixComponent = formatter.format(prefix);
-            sender.sendMessage("Your message prefix has been changed to: "+prefix);
-            sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
-
-        } else if (args.size()==3){
-            if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer player = getOfflinePlayer(args.get(1));
-            if (player==null) return 1;
-            targetUUID = player.getUniqueId();
-            prefix = args.get(2);
-
-            TextComponent prefixComponent = formatter.format(prefix);
-            sender.sendMessage(args.get(1)+"'s message prefix has been changed to: "+prefix);
-            sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
-
-        } else {
-            return 1;
-        }
-
-        HashMap<String, String> playerMap = new HashMap<>();
-        if (TeiloChat.formatMap.containsKey(targetUUID))
-            playerMap = TeiloChat.formatMap.get(targetUUID);
-        playerMap.put("msgprefix", prefix);
-        TeiloChat.formatMap.put(targetUUID, playerMap);
-
-        saveConfig();
-
-        return 0;
-    }
-
-    public int reset(CommandSender sender, LinkedList<String> args){
-        if (args.size()==1){
-            if (!(sender instanceof Player)) return 3;
-            TeiloChat.formatMap.remove(((Player) sender).getUniqueId());
-            sender.sendMessage("Your message prefix has been reset");
-        }
-        else if (args.size()==2){
-            if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer player = getOfflinePlayer(args.get(1));
-            TeiloChat.formatMap.remove(player.getUniqueId());
-            sender.sendMessage(args.get(1)+"'s message prefix has been reset");
-        } else {
-            return 1;
-        }
-        saveConfig();
-        return 0;
     }
 
 }

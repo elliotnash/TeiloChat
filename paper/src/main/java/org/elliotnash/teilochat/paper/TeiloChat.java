@@ -12,8 +12,6 @@ import java.util.logging.Logger;
 
 public final class TeiloChat extends JavaPlugin {
 
-    public static ConfigManager config;
-    public static HashMap<UUID, HashMap<String, String>> formatMap = new HashMap<>();
     public static Logger logger;
     public static Plugin plugin;
 
@@ -25,14 +23,14 @@ public final class TeiloChat extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         //get config
-        config = new ConfigManager(this.getDataFolder()+"/config.yml");
+        ConfigManager config = new ConfigManager(this.getDataFolder()+"/config.yml");
         logger = this.getLogger();
         plugin = this;
 
 
-        getServer().getPluginManager().registerEvents(new ChatListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(config), this);
 
-        getCommand("teilochat").setExecutor(new CommandListener());
+        getCommand("teilochat").setExecutor(new CommandListener(config));
     }
 
     @Override

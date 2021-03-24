@@ -1,74 +1,31 @@
-package org.elliotnash.teilochat.core;
+package org.elliotnash.teilochat.core.commands;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.elliotnash.teilochat.core.ChatFormatter;
+import org.elliotnash.teilochat.core.PlatformUtils;
+import org.elliotnash.teilochat.core.Sender;
 import org.elliotnash.teilochat.core.config.ConfigManager;
 import org.elliotnash.teilochat.core.config.PlayerFormat;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class CommandHandler {
+public class CommandExecutor {
 
-    ChatFormatter formatter = new ChatFormatter();
-    PlatformUtils platformUtils;
-    ConfigManager config;
+    private final ChatFormatter formatter = new ChatFormatter();
+    private final CommandMessages messages = new CommandMessages();
+    private final PlatformUtils platformUtils;
+    private final ConfigManager config;
 
-    public CommandHandler(ConfigManager config, PlatformUtils platformUtils){
+    public CommandExecutor(ConfigManager config, PlatformUtils platformUtils){
         this.config = config;
         this.platformUtils = platformUtils;
     }
 
-
-    public void sendHelp(Sender sender){
-        sender.send("/tc name <name> sets your name");
-        sender.send("/tc msgprefix <prefix> sets the prefix before your message");
-        sender.send("/tc reset resets your chat customization");
-        sender.send("If you need to include spaces in your name or prefix, please surround it with quotes");
-        sender.send("ie. /tc name \"Elliot Nash\" would set my name to Elliot Nash");
-    }
-    public void sendInvalidCommand(Sender sender){
-        sender.send(MiniMessage.get().parse("<red>Invalid command!"));
-        sendHelp(sender);
-    }
-    public void sendMissingPerm(Sender sender){
-        sender.send(MiniMessage.get().parse("<red>You are missing permission to set other people's names!"));
-    }
-    public void sendConsole(Sender sender){
-        sender.send(MiniMessage.get().parse("<red>You can't run this message from console!"));
-    }
-    public void sendNameTaken(Sender sender){
-        sender.send(MiniMessage.get().parse("<red>You can't set your name to another users' name!"));
-    }
-    public void sendInvalidUser(Sender sender){
-        sender.send(MiniMessage.get().parse("<red>Invalid user!"));
-    }
-
-
-    public LinkedList<String> parser(String args){
-        //convert arg array to String
-//        StringBuilder argStringBuilder = new StringBuilder();
-//        for (String str : args){
-//            argStringBuilder.append(str).append(" ");
-//        }
-//        argStringBuilder.setLength(argStringBuilder.length()-1);
-//        String argString = argStringBuilder.toString();
-
-        //parse by spaces, but also also keep quotations
-        LinkedList<String> argList = new LinkedList<>();
-        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(args);
-        while (m.find())
-            argList.add(m.group(1).replace("\"", ""));
-        return argList;
-    }
-
-    public boolean setName(Sender sender, String argsStr){
-        LinkedList<String> args = parser(argsStr);
+    public boolean setName(Sender sender, LinkedList<String> args){
         if (args.size()==1){
             if (sender.isConsole()) {
-                sendConsole(sender);
+                messages.sendConsole(sender);
                 return false;
             }
             if (!config.contains(sender.getUUID()) || config.get(sender.getUUID()).name == null)
@@ -81,13 +38,13 @@ public class CommandHandler {
             }
         } else if (args.size()==2){
             if (sender.isConsole()) {
-                sendConsole(sender);
+                messages.sendConsole(sender);
                 return false;
             }
             String name = args.get(1);
 
-            if (platformUtils.uniqueName(name, sender)){
-                sendNameTaken(sender);
+            if (!platformUtils.uniqueName(name, sender)){
+                messages.sendNameTaken(sender);
                 return false;
             }
 
@@ -102,18 +59,18 @@ public class CommandHandler {
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) {
-                sendMissingPerm(sender);
+                messages.sendMissingPerm(sender);
                 return false;
             }
             Sender targetSender = platformUtils.getSenderFromName(args.get(1));
             if (targetSender == null){
-                sendInvalidUser(sender);
+                messages.sendInvalidUser(sender);
                 return false;
             }
             String name = args.get(2);
 
             if (!platformUtils.uniqueName(name, sender)) {
-                sendNameTaken(sender);
+                messages.sendNameTaken(sender);
                 return false;
             }
 
@@ -130,17 +87,16 @@ public class CommandHandler {
             targetSender.send(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else {
-            sendInvalidCommand(sender);
+            messages.sendInvalidCommand(sender);
             return false;
         }
         return true;
     }
 
-    public boolean setMsgPrefix(Sender sender, String argsStr){
-        LinkedList<String> args = parser(argsStr);
+    public boolean setMsgPrefix(Sender sender, LinkedList<String> args){
         if (args.size()==1){
             if (sender.isConsole()) {
-                sendConsole(sender);
+                messages.sendConsole(sender);
                 return false;
             }
             if (!config.contains(sender.getUUID()) || config.get(sender.getUUID()).msgprefix == null)
@@ -153,7 +109,7 @@ public class CommandHandler {
             }
         } else if (args.size()==2){
             if (sender.isConsole()) {
-                sendConsole(sender);
+                messages.sendConsole(sender);
                 return false;
             }
             String msgprefix = args.get(1);
@@ -168,12 +124,12 @@ public class CommandHandler {
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) {
-                sendMissingPerm(sender);
+                messages.sendMissingPerm(sender);
                 return false;
             }
             Sender targetSender = platformUtils.getSenderFromName(args.get(1));
             if (targetSender == null){
-                sendInvalidUser(sender);
+                messages.sendInvalidUser(sender);
                 return false;
             }
             String msgprefix = args.get(2);
@@ -187,36 +143,37 @@ public class CommandHandler {
             sender.send(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else {
-            sendInvalidCommand(sender);
+            messages.sendInvalidCommand(sender);
             return false;
         }
         return true;
     }
 
-    public boolean reset(Sender sender, String argsStr){
-        LinkedList<String> args = parser(argsStr);
+    public boolean reset(Sender sender, LinkedList<String> args){
         if (args.size()==1){
             if (sender.isConsole()) {
-                sendConsole(sender);
+                messages.sendConsole(sender);
                 return false;
             }
             config.remove(sender.getUUID());
+            config.write();
             sender.send("Your name and message prefix have been reset");
         }
         else if (args.size()==2){
             if (!sender.hasPermission("teilochat.other")) {
-                sendMissingPerm(sender);
+                messages.sendMissingPerm(sender);
                 return false;
             }
             Sender targetSender = platformUtils.getSenderFromName(args.get(1));
             if (targetSender == null){
-                sendInvalidUser(sender);
+                messages.sendInvalidUser(sender);
                 return false;
             }
             config.remove(targetSender.getUUID());
+            config.write();
             sender.send(args.get(1)+"'s name and message prefix have been reset");
         } else {
-            sendInvalidCommand(sender);
+            messages.sendInvalidCommand(sender);
             return false;
         }
         return true;
