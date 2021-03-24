@@ -156,10 +156,14 @@ public class CommandHandler {
                 sendConsole(sender);
                 return false;
             }
-            String prefix = args.get(1);
+            String msgprefix = args.get(1);
 
-            TextComponent prefixComponent = formatter.format(prefix);
-            sender.send("Your message prefix has been changed to: "+prefix);
+            config.add(sender.getUUID(), new PlayerFormat());
+            config.get(sender.getUUID()).msgprefix = msgprefix;
+            config.write();
+
+            TextComponent prefixComponent = formatter.format(msgprefix);
+            sender.send("Your message prefix has been changed to: "+msgprefix);
             sender.send(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else if (args.size()==3){
@@ -172,42 +176,49 @@ public class CommandHandler {
                 sendInvalidUser(sender);
                 return false;
             }
-            String prefix = args.get(2);
+            String msgprefix = args.get(2);
 
-            TextComponent prefixComponent = formatter.format(prefix);
-            sender.send(args.get(1)+"'s message prefix has been changed to: "+prefix);
+            config.add(targetSender.getUUID(), new PlayerFormat());
+            config.get(targetSender.getUUID()).msgprefix = msgprefix;
+            config.write();
+
+            TextComponent prefixComponent = formatter.format(msgprefix);
+            sender.send(args.get(1)+"'s message prefix has been changed to: "+msgprefix);
             sender.send(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else {
-            return 1;
+            sendInvalidCommand(sender);
+            return false;
         }
-
-        HashMap<String, String> playerMap = new HashMap<>();
-        if (TeiloChat.formatMap.containsKey(targetUUID))
-            playerMap = TeiloChat.formatMap.get(targetUUID);
-        playerMap.put("msgprefix", prefix);
-        TeiloChat.formatMap.put(targetUUID, playerMap);
-
-        saveConfig();
-
-        return 0;
+        return true;
     }
 
-    public int reset(CommandSender sender, LinkedList<String> args){
+    public boolean reset(Sender sender, String argsStr){
+        LinkedList<String> args = parser(argsStr);
         if (args.size()==1){
-            if (!(sender instanceof Player)) return 3;
-            TeiloChat.formatMap.remove(((Player) sender).getUniqueId());
-            sender.sendMessage("Your message prefix has been reset");
+            if (sender.isConsole()) {
+                sendConsole(sender);
+                return false;
+            }
+            config.remove(sender.getUUID());
+            sender.send("Your name and message prefix have been reset");
         }
         else if (args.size()==2){
-            if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer player = getOfflinePlayer(args.get(1));
-            TeiloChat.formatMap.remove(player.getUniqueId());
-            sender.sendMessage(args.get(1)+"'s message prefix has been reset");
+            if (!sender.hasPermission("teilochat.other")) {
+                sendMissingPerm(sender);
+                return false;
+            }
+            Sender targetSender = platformUtils.getSenderFromName(args.get(1));
+            if (targetSender == null){
+                sendInvalidUser(sender);
+                return false;
+            }
+            config.remove(targetSender.getUUID());
+            sender.send(args.get(1)+"'s name and message prefix have been reset");
         } else {
-            return 1;
+            sendInvalidCommand(sender);
+            return false;
         }
-        saveConfig();
-        return 0;
+        return true;
     }
 }

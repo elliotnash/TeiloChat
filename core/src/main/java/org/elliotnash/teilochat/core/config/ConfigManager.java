@@ -44,6 +44,11 @@ public class ConfigManager {
         return config.playerFormats.containsKey(uuid);
     }
 
+    public void remove(String uuid){remove(UUID.fromString(uuid));}
+    public void remove(UUID uuid){
+        config.playerFormats.remove(uuid);
+    }
+
     //Write must be explicitly called after every modification
     public void write(){
         try {
