@@ -37,7 +37,8 @@ public class TeiloChat {
 
         ConfigManager config = new ConfigManager(dataDirectory.resolve("config.yml"));
 
-        server.getEventManager().register(this, new ChatListener(config));
+        server.getEventManager().register(this, new ChatListener(server, config));
+
     }
 
     public void onChat(){
