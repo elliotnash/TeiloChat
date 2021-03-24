@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.elliotnash.teilochat.core.ChatFormatter;
+
 public class ChatListener implements Listener{
 
     ChatFormatter formatter = new ChatFormatter();
