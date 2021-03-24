@@ -16,7 +16,10 @@ public class ConfigManager {
     private final File configFile;
 
     public ConfigManager(String configPath) throws InputMismatchException {
-        configFile = new File("/Users/elliot/Desktop/config2.yml");
+        this(new File(configPath));
+    }
+    public ConfigManager(File configFile) throws InputMismatchException {
+        this.configFile = configFile;
         mapper = new ObjectMapper(new YAMLFactory());
 
         try {
@@ -52,7 +55,7 @@ public class ConfigManager {
     //Write must be explicitly called after every modification
     public void write(){
         try {
-            mapper.writeValue(new File("/Users/elliot/Desktop/config2.yml"), config);
+            mapper.writeValue(configFile, config);
         } catch (IOException e) {
             e.printStackTrace();
         }
