@@ -1,6 +1,6 @@
 name: TeiloChat
 version: ${jenkins.buildNumber}
-main: org.elliotnash.teilochat.TeiloChat
+main: org.elliotnash.teilochat.paper.TeiloChat
 api-version: 1.16
 authors: [Elliot Nash]
 description: Chat customization plugin for spigot
