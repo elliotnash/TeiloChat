@@ -29,7 +29,7 @@ public class CommandHandler {
         sender.send("If you need to include spaces in your name or prefix, please surround it with quotes");
         sender.send("ie. /tc name \"Elliot Nash\" would set my name to Elliot Nash");
     }
-    public void sendInvalid(Sender sender){
+    public void sendInvalidCommand(Sender sender){
         sender.send(MiniMessage.get().parse("<red>Invalid command!"));
         sendHelp(sender);
     }
@@ -66,28 +66,30 @@ public class CommandHandler {
 
     public boolean setName(Sender sender, String argsStr){
         LinkedList<String> args = parser(argsStr);
-        String name;
         if (args.size()==1){
-            if (sender.isConsole()) return 3;
-            if (config.contains(sender.getUUID()))
+            if (sender.isConsole()) {
+                sendConsole(sender);
+                return false;
+            }
+            if (!config.contains(sender.getUUID()) || config.get(sender.getUUID()).name == null)
                 sender.send("You don't have a custom name set.");
             else{
                 PlayerFormat format = config.get(sender.getUUID());
-                if (format.name!=null)
-                    sender.send("You don't have a custom name set");
-                else {
-                    TextComponent nameComponent = formatter.format(format.name);
-                    sender.send("Your name is set to: "+format.name);
-                    sender.send(Component.text("With adventure formatting: ").append(nameComponent));
-                }
+                TextComponent nameComponent = formatter.format(format.name);
+                sender.send("Your name is set to: "+format.name);
+                sender.send(Component.text("With adventure formatting: ").append(nameComponent));
             }
-            return 0;
         } else if (args.size()==2){
-            if (sender.isConsole()) return 3;
-            name = args.get(1);
+            if (sender.isConsole()) {
+                sendConsole(sender);
+                return false;
+            }
+            String name = args.get(1);
 
-            if (platformUtils.uniqueName(name, sender))
-                return 4;
+            if (platformUtils.uniqueName(name, sender)){
+                sendNameTaken(sender);
+                return false;
+            }
 
             TextComponent nameComponent = formatter.format(name);
 
@@ -99,14 +101,21 @@ public class CommandHandler {
             sender.send(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else if (args.size()==3){
-            if (!sender.hasPermission("teilochat.other")) return 2;
+            if (!sender.hasPermission("teilochat.other")) {
+                sendMissingPerm(sender);
+                return false;
+            }
             Sender targetSender = platformUtils.getSenderFromName(args.get(1));
-            if (targetSender == null)
-                return 5;
-            name = args.get(2);
+            if (targetSender == null){
+                sendInvalidUser(sender);
+                return false;
+            }
+            String name = args.get(2);
 
-            if (platformUtils.uniqueName(name, sender))
-                return 4;
+            if (!platformUtils.uniqueName(name, sender)) {
+                sendNameTaken(sender);
+                return false;
+            }
 
             TextComponent nameComponent = formatter.format(name);
 
@@ -121,50 +130,53 @@ public class CommandHandler {
             targetSender.send(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else {
-            return 1;
+            sendInvalidCommand(sender);
+            return false;
         }
         return true;
     }
 
-    public int setMsgPrefix(Sender sender, String argsStr){
+    public boolean setMsgPrefix(Sender sender, String argsStr){
         LinkedList<String> args = parser(argsStr);
-        String prefix;
         if (args.size()==1){
-            if (sender.isConsole()) return 3;
-            if (!TeiloChat.formatMap.containsKey(targetUUID))
-                sender.sendMessage("You don't have a custom message prefix set.");
-            else{
-                HashMap<String, String> playerMap = TeiloChat.formatMap.get(targetUUID);
-                if (!playerMap.containsKey("msgprefix"))
-                    sender.sendMessage("You don't have a custom message prefix set");
-                else {
-                    prefix = playerMap.get("msgprefix");
-
-                    TextComponent prefixComponent = formatter.format(prefix);
-                    sender.sendMessage("Your message prefix is set to: "+prefix);
-                    sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
-                }
+            if (sender.isConsole()) {
+                sendConsole(sender);
+                return false;
             }
-            return 0;
+            if (!config.contains(sender.getUUID()) || config.get(sender.getUUID()).msgprefix == null)
+                sender.send("You don't have a custom message prefix set.");
+            else{
+                PlayerFormat format = config.get(sender.getUUID());
+                TextComponent prefixComponent = formatter.format(format.msgprefix);
+                sender.send("Your message prefix is set to: \""+format.msgprefix+"\"");
+                sender.send(Component.text("With adventure formatting: ").append(prefixComponent));
+            }
         } else if (args.size()==2){
-            if (!(sender instanceof Player)) return 3;
-            targetUUID = ((Player) sender).getUniqueId();
-            prefix = args.get(1);
+            if (sender.isConsole()) {
+                sendConsole(sender);
+                return false;
+            }
+            String prefix = args.get(1);
 
             TextComponent prefixComponent = formatter.format(prefix);
-            sender.sendMessage("Your message prefix has been changed to: "+prefix);
-            sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
+            sender.send("Your message prefix has been changed to: "+prefix);
+            sender.send(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else if (args.size()==3){
-            if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer player = getOfflinePlayer(args.get(1));
-            if (player==null) return 1;
-            targetUUID = player.getUniqueId();
-            prefix = args.get(2);
+            if (!sender.hasPermission("teilochat.other")) {
+                sendMissingPerm(sender);
+                return false;
+            }
+            Sender targetSender = platformUtils.getSenderFromName(args.get(1));
+            if (targetSender == null){
+                sendInvalidUser(sender);
+                return false;
+            }
+            String prefix = args.get(2);
 
             TextComponent prefixComponent = formatter.format(prefix);
-            sender.sendMessage(args.get(1)+"'s message prefix has been changed to: "+prefix);
-            sender.sendMessage(Component.text("With adventure formatting: ").append(prefixComponent));
+            sender.send(args.get(1)+"'s message prefix has been changed to: "+prefix);
+            sender.send(Component.text("With adventure formatting: ").append(prefixComponent));
 
         } else {
             return 1;
