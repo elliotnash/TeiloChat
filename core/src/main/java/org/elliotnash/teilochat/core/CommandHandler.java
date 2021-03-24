@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.elliotnash.teilochat.core.config.ConfigManager;
 import org.elliotnash.teilochat.core.config.PlayerFormat;
-import org.elliotnash.teilochat.core.player.Sender;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -13,10 +12,12 @@ import java.util.regex.Pattern;
 public class CommandHandler {
 
     ChatFormatter formatter = new ChatFormatter();
+    PlatformUtils platformUtils;
     ConfigManager config;
 
-    public CommandHandler(ConfigManager config){
+    public CommandHandler(ConfigManager config, PlatformUtils platformUtils){
         this.config = config;
+        this.platformUtils = platformUtils;
     }
 
     public LinkedList<String> parser(String[] args){
@@ -57,25 +58,20 @@ public class CommandHandler {
             return 0;
         } else if (args.size()==2){
             if (sender.isConsole()) return 3;
-            Player player = ((Player) sender);
-            targetUUID = player.getUniqueId();
+            targetUUID = sender.getUUID();
             name = args.get(1);
 
-            for (OfflinePlayer playerLoop : Bukkit.getOfflinePlayers()){
-                String playerName = playerLoop.getName();
-                if (playerName.equals(((Player) sender).getName()))
-                    continue;
-                if (name.toLowerCase().contains(playerName.toLowerCase()))
-                    return 4;
-            }
+            if (platformUtils.uniqueName(name, sender))
+                return 4;
 
             TextComponent nameComponent = formatter.format(name);
 
-            player.displayName(nameComponent);
-            player.playerListName(nameComponent);
+            config.add(sender.getUUID(), new PlayerFormat());
+            config.get(sender.getUUID()).name = name;
+            config.write();
 
-            sender.sendMessage("Your name has been changed to: "+name);
-            player.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
+            sender.send("Your name has been changed to: "+name);
+            sender.send(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;

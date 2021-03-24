@@ -1,4 +1,4 @@
-package org.elliotnash.teilochat.core.player;
+package org.elliotnash.teilochat.core;
 
 import net.kyori.adventure.text.Component;
 
@@ -10,4 +10,6 @@ public interface Sender {
     void send(String message);
     boolean isConsole();
     UUID getUUID();
+    String getName();
+    boolean hasPermission(String permission);
 }
