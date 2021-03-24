@@ -35,9 +35,8 @@ public class ChatListener implements Listener{
 
         Component message = chat.message(new PaperSender(event.getPlayer()), event.getMessage());
 
-        for (Player player : event.getRecipients()){
-            player.sendMessage(message);
-        }
+        event.getRecipients().forEach((player)->{player.sendMessage(message);});
+
         Bukkit.getConsoleSender().sendMessage(Component.text()
                 .append(MiniMessage.get().parse("<rainbow>["+event.getPlayer().getName()+"] </rainbow>"))
                 .append(message));
