@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.UUID;
@@ -17,6 +18,9 @@ public class ConfigManager {
 
     public ConfigManager(String configPath) throws InputMismatchException {
         this(new File(configPath));
+    }
+    public ConfigManager(Path configPath) throws InputMismatchException {
+        this(configPath.toFile());
     }
     public ConfigManager(File configFile) throws InputMismatchException {
         this.configFile = configFile;

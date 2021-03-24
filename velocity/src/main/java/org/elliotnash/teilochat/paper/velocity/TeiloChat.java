@@ -35,10 +35,9 @@ public class TeiloChat {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
 
-        //ConfigManager config = new ConfigManager(dataDirectory.+"/config.yml");
+        ConfigManager config = new ConfigManager(dataDirectory.resolve("config.yml"));
 
-
-        server.getEventManager().register(this, new ChatListener());
+        server.getEventManager().register(this, new ChatListener(config));
     }
 
     public void onChat(){
