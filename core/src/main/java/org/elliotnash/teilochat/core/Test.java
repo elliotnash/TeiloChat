@@ -4,15 +4,19 @@ import org.elliotnash.teilochat.core.config.ConfigManager;
 import org.elliotnash.teilochat.core.config.PlayerFormat;
 
 import java.io.*;
+import java.util.InputMismatchException;
 
 public class Test {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        ConfigManager manager = new ConfigManager("/Users/elliot/Desktop/config.yml");
-
-        manager.add("548612a6-c689-4aef-995b-fd00eb6ae664", new PlayerFormat());
-
-        manager.write();
+        ConfigManager manager;
+        try {
+            manager = new ConfigManager("/Users/elliot/Desktop/config.yml");
+        } catch (InputMismatchException e){
+            System.out.println("Invalid configuration file, disabling");
+            System.out.println(e.getMessage());;
+            return;
+        }
 
     }
 }

@@ -16,14 +16,14 @@ public class ConfigManager {
     private final File configFile;
 
     public ConfigManager(String configPath) throws InputMismatchException {
-        configFile = new File("/Users/elliot/Desktop/config3.yml");
+        configFile = new File("/Users/elliot/Desktop/config2.yml");
         mapper = new ObjectMapper(new YAMLFactory());
 
         try {
             config = mapper.readValue(configFile, TeiloChatConfig.class);
         } catch (MismatchedInputException e){
             config = new TeiloChatConfig();
-            throw new InputMismatchException();
+            throw new InputMismatchException(e.getMessage());
         } catch (IOException e) {
             config = new TeiloChatConfig();
         }
@@ -37,6 +37,11 @@ public class ConfigManager {
     public void add(String uuid, PlayerFormat playerFormat){add(UUID.fromString(uuid), playerFormat);}
     public void add(UUID uuid, PlayerFormat playerFormat){
         config.playerFormats.putIfAbsent(uuid, playerFormat);
+    }
+
+    public boolean contains(String uuid){return contains(UUID.fromString(uuid));}
+    public boolean contains(UUID uuid){
+        return config.playerFormats.containsKey(uuid);
     }
 
     //Write must be explicitly called after every modification
