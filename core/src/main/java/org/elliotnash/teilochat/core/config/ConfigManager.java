@@ -1,23 +1,32 @@
 package org.elliotnash.teilochat.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.UUID;
 
 public class ConfigManager {
 
-    private final TeiloChatConfig config;
-    private ObjectMapper mapper;
+    private TeiloChatConfig config;
+    private final ObjectMapper mapper;
     private final File configFile;
 
-    public ConfigManager(String configPath) throws IOException {
-        configFile = new File(configPath);
-
+    public ConfigManager(String configPath) throws InputMismatchException {
+        configFile = new File("/Users/elliot/Desktop/config3.yml");
         mapper = new ObjectMapper(new YAMLFactory());
-        config = mapper.readValue(configFile, TeiloChatConfig.class);
+
+        try {
+            config = mapper.readValue(configFile, TeiloChatConfig.class);
+        } catch (MismatchedInputException e){
+            config = new TeiloChatConfig();
+            throw new InputMismatchException();
+        } catch (IOException e) {
+            config = new TeiloChatConfig();
+        }
     }
 
     public PlayerFormat get(String uuid){return get(UUID.fromString(uuid));}

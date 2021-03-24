@@ -4,5 +4,5 @@ import java.util.HashMap;
 import java.util.UUID;
 
 class TeiloChatConfig {
-    public HashMap<UUID, PlayerFormat> playerFormats;
+    public HashMap<UUID, PlayerFormat> playerFormats = new HashMap<>();
 }
