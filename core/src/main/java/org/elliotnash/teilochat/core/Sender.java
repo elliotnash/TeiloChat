@@ -12,4 +12,5 @@ public interface Sender {
     UUID getUUID();
     String getName();
     boolean hasPermission(String permission);
+    boolean isOffline();
 }

@@ -16,6 +16,9 @@ public class OfflinePaperSender implements Sender {
     }
 
     @Override
+    public boolean isOffline(){return true;}
+
+    @Override
     public boolean isConsole() {
         return false;
     }

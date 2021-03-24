@@ -23,10 +23,18 @@ public class PaperUtils implements PlatformUtils {
     }
     @Override
     public Sender getSenderFromName(String name){
-        OfflinePlayer offlinePlayer = getOfflinePlayer(name);
-        if (!offlinePlayer.hasPlayedBefore()){
-            return null;
+        OfflinePlayer player = null;
+        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()){
+            if (offlinePlayer.getName()!=null && offlinePlayer.getName().equals(name)){
+                player = offlinePlayer;
+            }
         }
-        return new PaperSender((CommandSender) offlinePlayer);
+        if (player == null)
+            return null;
+        if (player.isOnline()){
+            return new PaperSender(player.getPlayer());
+        } else {
+            return new OfflinePaperSender(player.getPlayer());
+        }
     }
 }

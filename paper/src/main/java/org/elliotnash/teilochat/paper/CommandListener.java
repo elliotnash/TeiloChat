@@ -105,6 +105,9 @@ public class CommandListener implements CommandExecutor, TabCompleter {
                 break;
             case 4:
                 sender.sendMessage(ChatColor.RED+"You can't set your name to another users' name");
+                break;
+            case 5:
+                sender.sendMessage(ChatColor.RED+"Invalid user");
         }
 
         return true;

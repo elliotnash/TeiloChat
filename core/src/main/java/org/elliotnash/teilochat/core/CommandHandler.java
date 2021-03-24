@@ -2,6 +2,7 @@ package org.elliotnash.teilochat.core;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.elliotnash.teilochat.core.config.ConfigManager;
 import org.elliotnash.teilochat.core.config.PlayerFormat;
 
@@ -20,33 +21,58 @@ public class CommandHandler {
         this.platformUtils = platformUtils;
     }
 
-    public LinkedList<String> parser(String[] args){
+
+    public void sendHelp(Sender sender){
+        sender.send("/tc name <name> sets your name");
+        sender.send("/tc msgprefix <prefix> sets the prefix before your message");
+        sender.send("/tc reset resets your chat customization");
+        sender.send("If you need to include spaces in your name or prefix, please surround it with quotes");
+        sender.send("ie. /tc name \"Elliot Nash\" would set my name to Elliot Nash");
+    }
+    public void sendInvalid(Sender sender){
+        sender.send(MiniMessage.get().parse("<red>Invalid command!"));
+        sendHelp(sender);
+    }
+    public void sendMissingPerm(Sender sender){
+        sender.send(MiniMessage.get().parse("<red>You are missing permission to set other people's names!"));
+    }
+    public void sendConsole(Sender sender){
+        sender.send(MiniMessage.get().parse("<red>You can't run this message from console!"));
+    }
+    public void sendNameTaken(Sender sender){
+        sender.send(MiniMessage.get().parse("<red>You can't set your name to another users' name!"));
+    }
+    public void sendInvalidUser(Sender sender){
+        sender.send(MiniMessage.get().parse("<red>Invalid user!"));
+    }
+
+
+    public LinkedList<String> parser(String args){
         //convert arg array to String
-        StringBuilder argStringBuilder = new StringBuilder();
-        for (String str : args){
-            argStringBuilder.append(str).append(" ");
-        }
-        argStringBuilder.setLength(argStringBuilder.length()-1);
-        String argString = argStringBuilder.toString();
+//        StringBuilder argStringBuilder = new StringBuilder();
+//        for (String str : args){
+//            argStringBuilder.append(str).append(" ");
+//        }
+//        argStringBuilder.setLength(argStringBuilder.length()-1);
+//        String argString = argStringBuilder.toString();
 
         //parse by spaces, but also also keep quotations
         LinkedList<String> argList = new LinkedList<>();
-        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(argString);
+        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(args);
         while (m.find())
             argList.add(m.group(1).replace("\"", ""));
         return argList;
     }
 
-    public int setName(Sender sender, List<String> args){
-        UUID targetUUID;
+    public boolean setName(Sender sender, String argsStr){
+        LinkedList<String> args = parser(argsStr);
         String name;
         if (args.size()==1){
             if (sender.isConsole()) return 3;
-            targetUUID = sender.getUUID();
-            if (config.contains(targetUUID))
+            if (config.contains(sender.getUUID()))
                 sender.send("You don't have a custom name set.");
             else{
-                PlayerFormat format = config.get(targetUUID);
+                PlayerFormat format = config.get(sender.getUUID());
                 if (format.name!=null)
                     sender.send("You don't have a custom name set");
                 else {
@@ -58,7 +84,6 @@ public class CommandHandler {
             return 0;
         } else if (args.size()==2){
             if (sender.isConsole()) return 3;
-            targetUUID = sender.getUUID();
             name = args.get(1);
 
             if (platformUtils.uniqueName(name, sender))
@@ -76,6 +101,8 @@ public class CommandHandler {
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;
             Sender targetSender = platformUtils.getSenderFromName(args.get(1));
+            if (targetSender == null)
+                return 5;
             name = args.get(2);
 
             if (platformUtils.uniqueName(name, sender))
@@ -96,34 +123,14 @@ public class CommandHandler {
         } else {
             return 1;
         }
-
-        HashMap<String, String> playerMap = new HashMap<>();
-        if (TeiloChat.formatMap.containsKey(targetUUID))
-            playerMap = TeiloChat.formatMap.get(targetUUID);
-        playerMap.put("name", name);
-        TeiloChat.formatMap.put(targetUUID, playerMap);
-
-        saveConfig();
-
-        return 0;
+        return true;
     }
 
-    public OfflinePlayer getOfflinePlayer(String name){
-        OfflinePlayer player = null;
-        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()){
-            if (offlinePlayer.getName()!=null && offlinePlayer.getName().equals(name)){
-                player = offlinePlayer;
-            }
-        }
-        return player;
-    }
-
-    public int setMsgPrefix(CommandSender sender, List<String> args){
-        UUID targetUUID;
+    public int setMsgPrefix(Sender sender, String argsStr){
+        LinkedList<String> args = parser(argsStr);
         String prefix;
         if (args.size()==1){
-            if (!(sender instanceof Player)) return 3;
-            targetUUID = ((Player) sender).getUniqueId();
+            if (sender.isConsole()) return 3;
             if (!TeiloChat.formatMap.containsKey(targetUUID))
                 sender.sendMessage("You don't have a custom message prefix set.");
             else{

@@ -17,6 +17,9 @@ public class PaperSender implements Sender {
     }
 
     @Override
+    public boolean isOffline(){return false;}
+
+    @Override
     public boolean isConsole() {
         return !(sender instanceof Player);
     }
