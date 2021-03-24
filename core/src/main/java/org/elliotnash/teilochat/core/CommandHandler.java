@@ -75,30 +75,23 @@ public class CommandHandler {
 
         } else if (args.size()==3){
             if (!sender.hasPermission("teilochat.other")) return 2;
-            OfflinePlayer offlinePlayer = getOfflinePlayer(args.get(1));
-            if (offlinePlayer==null) return 1;
-            targetUUID = offlinePlayer.getUniqueId();
+            Sender targetSender = platformUtils.getSenderFromName(args.get(1));
             name = args.get(2);
 
-            for (OfflinePlayer playerLoop : Bukkit.getOfflinePlayers()){
-                String playerName = playerLoop.getName();
-                if (playerName.equals(((Player) sender).getName()))
-                    continue;
-                if (name.toLowerCase().contains(playerName.toLowerCase()))
-                    return 4;
-            }
+            if (platformUtils.uniqueName(name, sender))
+                return 4;
 
             TextComponent nameComponent = formatter.format(name);
 
+            config.add(targetSender.getUUID(), new PlayerFormat());
+            config.get(targetSender.getUUID()).name = name;
+            config.write();
 
-            if (offlinePlayer.isOnline()){
-                Player player = offlinePlayer.getPlayer();
-                player.displayName(nameComponent);
-                player.playerListName(nameComponent);
-            }
+            sender.send(args.get(1)+"'s name has been changed to: "+name);
+            sender.send(Component.text("With adventure formatting: ").append(nameComponent));
 
-            sender.sendMessage(args.get(1)+"'s name has been changed to: "+name);
-            sender.sendMessage(Component.text("With adventure formatting: ").append(nameComponent));
+            targetSender.send("Your name has been changed to: "+name);
+            targetSender.send(Component.text("With adventure formatting: ").append(nameComponent));
 
         } else {
             return 1;
