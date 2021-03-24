@@ -2,31 +2,23 @@ package org.elliotnash.teilochat.core;
 
 import org.elliotnash.teilochat.core.config.ConfigManager;
 import org.elliotnash.teilochat.core.config.PlayerFormat;
-import org.elliotnash.teilochat.core.config.TeiloChatConfig;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 
 public class Test {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
 
-        ConfigManager manager = new ConfigManager("/Users/elliot/Downloads/config.yml");
+        ConfigManager manager;
+        try {
+            manager = new ConfigManager("/Users/elliot/Desktop/config.yml");
+        } catch (IOException e) {
+            return;
+        }
 
-        HashMap<String, PlayerFormat> test = new HashMap<>();
-
-        test.put("test", new PlayerFormat());
-
-        System.out.println(test.get("test"));
-
-        PlayerFormat tmp = test.get("test");
-        tmp.msgprefix = "fuck";
-
-        System.out.println(test);
+        manager.write();
 
     }
 }
