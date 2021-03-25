@@ -1,4 +1,4 @@
-package org.elliotnash.teilochat.paper.velocity;
+package org.elliotnash.teilochat.velocity;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
@@ -6,7 +6,6 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.ServerConnection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.elliotnash.teilochat.core.chat.ChatHandler;
@@ -31,7 +30,7 @@ public class ChatListener {
         server.getConsoleCommandSource().sendMessage(
             MiniMessage.get().parse(
                 "<rainbow>["+event.getPlayer().getCurrentServer().get().getServerInfo().getName()+"]"+
-                "["+event.getPlayer().getUsername()+"]</rainbow>")
+                "["+event.getPlayer().getUsername()+"] </rainbow>")
             .append(message)
         );
 

@@ -1,4 +1,4 @@
-package org.elliotnash.teilochat.paper.velocity;
+package org.elliotnash.teilochat.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -38,6 +38,8 @@ public class TeiloChat {
         ConfigManager config = new ConfigManager(dataDirectory.resolve("config.yml"));
 
         server.getEventManager().register(this, new ChatListener(server, config));
+
+        server.getCommandManager().register("tc", new CommandListener(server, config));
 
     }
 
