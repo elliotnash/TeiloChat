@@ -10,6 +10,8 @@ import org.elliotnash.teilochat.core.config.ConfigManager;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
+import java.util.InputMismatchException;
+import java.util.Optional;
 
 @Plugin(
         id = "teilochat",
@@ -36,6 +38,11 @@ public class TeiloChat {
     public void onProxyInitialization(ProxyInitializeEvent event) {
 
         ConfigManager config = new ConfigManager(dataDirectory.resolve("config.yml"));
+        Optional<String> result = config.read();
+        if (result.isPresent()){
+            logger.error("Error reading configuration file!");
+            logger.error(result.get());
+        }
 
         server.getEventManager().register(this, new ChatListener(server, config));
 

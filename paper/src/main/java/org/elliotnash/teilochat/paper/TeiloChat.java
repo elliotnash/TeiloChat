@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.elliotnash.teilochat.core.config.ConfigManager;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -22,11 +23,16 @@ public final class TeiloChat extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        //get config
-        ConfigManager config = new ConfigManager(this.getDataFolder()+"/config.yml");
         logger = this.getLogger();
         plugin = this;
 
+        //get config
+        ConfigManager config = new ConfigManager(this.getDataFolder()+"/config.yml");
+        Optional<String> result = config.read();
+        if (result.isPresent()){
+            logger.warning("Error reading configuration file!");
+            logger.warning(result.get());
+        }
 
         getServer().getPluginManager().registerEvents(new ChatListener(config), this);
 

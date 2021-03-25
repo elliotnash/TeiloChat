@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ConfigManager {
@@ -24,16 +25,20 @@ public class ConfigManager {
     }
     public ConfigManager(File configFile) throws InputMismatchException {
         this.configFile = configFile;
-        configFile.getParentFile().mkdirs();
         mapper = new ObjectMapper(new YAMLFactory());
+    }
 
+    public Optional<String> read(){
+        configFile.getParentFile().mkdirs();
         try {
             config = mapper.readValue(configFile, TeiloChatConfig.class);
+            return Optional.empty();
         } catch (MismatchedInputException e){
             config = new TeiloChatConfig();
-            throw new InputMismatchException(e.getMessage());
+            return Optional.of(e.getLocalizedMessage());
         } catch (IOException e) {
             config = new TeiloChatConfig();
+            return Optional.empty();
         }
     }
 
