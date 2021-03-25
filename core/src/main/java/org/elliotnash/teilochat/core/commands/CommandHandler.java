@@ -30,7 +30,7 @@ public class CommandHandler {
 
     public List<String> completion(Sender sender, String args){
         List<String> argsList = parser(args);
-        if (args.endsWith(" "))
+        if (args.endsWith(" ") || args.isEmpty())
             argsList.add("");
         return completionExecutor.completion(sender, argsList);
     }
