@@ -34,14 +34,14 @@ public class VelocitySender implements Sender {
 
     @Override
     public UUID getUUID() {
-        if (isConsole())
+        if (!isConsole())
             return ((Player) source).getUniqueId();
         return null;
     }
 
     @Override
     public String getName() {
-        if (isConsole())
+        if (!isConsole())
             return ((Player) source).getUsername();
         return null;
     }
