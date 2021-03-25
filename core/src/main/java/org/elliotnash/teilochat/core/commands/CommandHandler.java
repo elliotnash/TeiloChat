@@ -12,11 +12,12 @@ import java.util.regex.Pattern;
 public class CommandHandler {
 
     CommandExecutor commandExecutor;
-    CompletionExecutor completionExecutor = new CompletionExecutor();
+    CompletionExecutor completionExecutor;
     CommandMessages messages = new CommandMessages();
 
     public CommandHandler(ConfigManager config, PlatformUtils platformUtils){
         this.commandExecutor = new CommandExecutor(config, platformUtils);
+        this.completionExecutor = new CompletionExecutor(platformUtils);
     }
 
     public List<String> parser(String args){

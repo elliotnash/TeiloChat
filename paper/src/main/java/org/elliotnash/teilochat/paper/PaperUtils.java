@@ -6,8 +6,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.elliotnash.teilochat.core.PlatformUtils;
 import org.elliotnash.teilochat.core.Sender;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getOfflinePlayer;
+import static org.bukkit.Bukkit.getOfflinePlayers;
 
 public class PaperUtils implements PlatformUtils {
     @Override
@@ -36,5 +43,10 @@ public class PaperUtils implements PlatformUtils {
         } else {
             return new OfflinePaperSender(player.getPlayer());
         }
+    }
+    @Override
+    public List<Sender> getAllSenders(){
+        return Arrays.stream(getOfflinePlayers()).map(OfflinePaperSender::new)
+                .collect(Collectors.toList());
     }
 }

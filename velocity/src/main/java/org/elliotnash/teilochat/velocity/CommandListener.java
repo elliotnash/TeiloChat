@@ -1,14 +1,10 @@
 package org.elliotnash.teilochat.velocity;
 
-import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.RawCommand;
 import com.velocitypowered.api.proxy.ProxyServer;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elliotnash.teilochat.core.commands.CommandHandler;
 import org.elliotnash.teilochat.core.config.ConfigManager;
 
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
