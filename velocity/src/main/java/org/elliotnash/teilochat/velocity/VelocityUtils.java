@@ -5,7 +5,10 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import org.elliotnash.teilochat.core.PlatformUtils;
 import org.elliotnash.teilochat.core.Sender;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class VelocityUtils implements PlatformUtils {
 
@@ -25,4 +28,11 @@ public class VelocityUtils implements PlatformUtils {
         Optional<Player> player = server.getPlayer(name);
         return player.map(VelocitySender::new).orElse(null);
     }
+
+    @Override
+    public List<Sender> getAllSenders(){
+        return server.getAllPlayers().stream().map(((Function<Player, Sender>) VelocitySender::new))
+                .collect(Collectors.toList());
+    }
+
 }

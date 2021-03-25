@@ -5,19 +5,22 @@ import org.elliotnash.teilochat.core.Sender;
 import org.elliotnash.teilochat.core.config.ConfigManager;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommandHandler {
 
-    CommandExecutor executor;
+    CommandExecutor commandExecutor;
+    CompletionExecutor completionExecutor;
     CommandMessages messages = new CommandMessages();
 
     public CommandHandler(ConfigManager config, PlatformUtils platformUtils){
-        this.executor = new CommandExecutor(config, platformUtils);
+        this.commandExecutor = new CommandExecutor(config, platformUtils);
+        this.completionExecutor = new CompletionExecutor(platformUtils);
     }
 
-    public LinkedList<String> parser(String args){
+    public List<String> parser(String args){
         //parse by spaces, but also also keep quotations
         LinkedList<String> argList = new LinkedList<>();
         Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(args);
@@ -26,20 +29,27 @@ public class CommandHandler {
         return argList;
     }
 
+    public List<String> completion(Sender sender, String args){
+        List<String> argsList = parser(args);
+        if (args.endsWith(" ") || args.isEmpty())
+            argsList.add("");
+        return completionExecutor.completion(sender, argsList);
+    }
+
     public void command(Sender sender, String args){
 
-        LinkedList<String> argList = parser(args);
+        List<String> argList = parser(args);
 
         if (argList.size() >= 1 && argList.size() <= 3){
             switch (argList.get(0)){
                 case "name":
-                    executor.setName(sender, argList);
+                    commandExecutor.setName(sender, argList);
                     break;
                 case "msgprefix":
-                    executor.setMsgPrefix(sender, argList);
+                    commandExecutor.setMsgPrefix(sender, argList);
                     break;
                 case "reset":
-                    executor.reset(sender, argList);
+                    commandExecutor.reset(sender, argList);
                     break;
                 default:
                     messages.sendInvalidCommand(sender);
