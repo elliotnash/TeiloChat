@@ -15,7 +15,6 @@ public final class CommandListener implements RawCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        System.out.println(invocation.arguments());
         handler.command(new VelocitySender(invocation.source()), invocation.arguments());
     }
 

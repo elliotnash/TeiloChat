@@ -24,6 +24,7 @@ public class ConfigManager {
     }
     public ConfigManager(File configFile) throws InputMismatchException {
         this.configFile = configFile;
+        configFile.getParentFile().mkdirs();
         mapper = new ObjectMapper(new YAMLFactory());
 
         try {
