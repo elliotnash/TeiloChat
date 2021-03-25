@@ -33,25 +33,8 @@ public class CommandListener implements org.bukkit.command.CommandExecutor, TabC
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 
-        LinkedList<String> commands = new LinkedList<String>();
-        final LinkedList<String> completions = new LinkedList<String>();
-        switch (args.length){
-            case 1:
-                commands = new LinkedList<String>(Arrays.asList("name", "msgprefix", "reset"));
-                StringUtil.copyPartialMatches(args[0], commands, completions);
-                break;
-            case 2:
-                if (sender.hasPermission("teilochat.other")){
-                    for (OfflinePlayer player : Bukkit.getOfflinePlayers()){
-                        commands.add(player.getName());
-                    }
-                    StringUtil.copyPartialMatches(args[1], commands, completions);
-                }
-                break;
-        }
+        return handler.completion(new PaperSender(sender), concat(args));
 
-        Collections.sort(completions);
-        return completions;
     }
 
     @Override
