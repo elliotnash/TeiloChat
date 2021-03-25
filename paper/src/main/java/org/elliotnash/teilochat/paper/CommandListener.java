@@ -20,6 +20,16 @@ public class CommandListener implements org.bukkit.command.CommandExecutor, TabC
         handler = new CommandHandler(config, new PaperUtils());
     }
 
+    public String concat(String[] args){
+        StringBuilder argStringBuilder = new StringBuilder();
+        for (String str : args){
+            argStringBuilder.append(str).append(" ");
+        }
+        if (args.length != 0)
+            argStringBuilder.setLength(argStringBuilder.length()-1);
+        return argStringBuilder.toString();
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 
@@ -47,15 +57,9 @@ public class CommandListener implements org.bukkit.command.CommandExecutor, TabC
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        StringBuilder argStringBuilder = new StringBuilder();
-        for (String str : args){
-            argStringBuilder.append(str).append(" ");
-        }
-        if (args.length != 0)
-            argStringBuilder.setLength(argStringBuilder.length()-1);
-        String argString = argStringBuilder.toString();
 
-        handler.command(new PaperSender(sender), argString);
+
+        handler.command(new PaperSender(sender), concat(args));
 
         return true;
     }

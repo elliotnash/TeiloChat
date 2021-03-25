@@ -22,7 +22,7 @@ public class CommandExecutor {
         this.platformUtils = platformUtils;
     }
 
-    public boolean setName(Sender sender, LinkedList<String> args){
+    public boolean setName(Sender sender, List<String> args){
         if (args.size()==1){
             if (sender.isConsole()) {
                 messages.sendConsole(sender);
@@ -93,7 +93,7 @@ public class CommandExecutor {
         return true;
     }
 
-    public boolean setMsgPrefix(Sender sender, LinkedList<String> args){
+    public boolean setMsgPrefix(Sender sender, List<String> args){
         if (args.size()==1){
             if (sender.isConsole()) {
                 messages.sendConsole(sender);
@@ -149,7 +149,7 @@ public class CommandExecutor {
         return true;
     }
 
-    public boolean reset(Sender sender, LinkedList<String> args){
+    public boolean reset(Sender sender, List<String> args){
         if (args.size()==1){
             if (sender.isConsole()) {
                 messages.sendConsole(sender);
