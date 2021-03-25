@@ -23,8 +23,10 @@ public final class CommandListener implements RawCommand {
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation){
         CompletableFuture<List<String>> future = new CompletableFuture<>();
-        List<String> completions = handler.completion(new VelocitySender(invocation.source()), invocation.arguments());
-        future.complete(completions);
+        new Thread(()->{
+            List<String> completions = handler.completion(new VelocitySender(invocation.source()), invocation.arguments());
+            future.complete(completions);
+        }).start();
         return future;
     }
 
